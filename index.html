@@ -2,15 +2,19 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Turing machine in JavaScript</title>
-	<link rel="stylesheet" href="static/style.css" />
-	<script src="static/jquery.js"></script>
-	<script src="static/raphael.js"></script>
-	<script src="static/joint.js"></script>
-	<script src="static/turing.js"></script>
+	<link rel="stylesheet" href="css/style.css" />
+	<link href='css/font-awesome.css' rel='stylesheet' />
+
+	<script src="js/vendor/jquery.js"></script>
+	<script src="js/vendor/raphael.js"></script>
+	<script src="js/vendor/joint.js"></script>
+
+	<script src="js/app/turing.js"></script>
 	<script>
 		$(function () {
 
 			// Graph
+			/*
 	        var r = Raphael('canvas', 640, 400);
 			var top = 200;
 			
@@ -72,12 +76,11 @@
 	        s3.joint(s7, {label: '0 / 0, R', attrs: {'stroke-dasharray': 'none'}});
 	        s7.joint(s7, {label: '* / *, R\n1 / 1, R\n0 / 0, R\n= / =, R', vertices: ['230 ' + (top - 170), '160 ' + (top - 170)], attrs: {'stroke-dasharray': 'none'}});
 	        s7.joint(s8, {label: '  / 0, R', attrs: {'stroke-dasharray': 'none'}});
+			*/
 
 	        // Steps
 			var steps = {};
-
-	        // s1: 
-	        steps['s1:1'] = {state: 's2', value: 'X', move: 'right'};
+			steps['s1:1'] = {state: 's2', value: 'X', move: 'right'};
 	        steps['s1:*'] = {state: 's8', value: '*', move: 'right'};
 
 	        // s2: move to right until * and goto s3 
@@ -112,87 +115,166 @@
 	        steps['s7:0'] = {state: 's7', value: '0', move: 'right'};
 	        steps['s7:='] = {state: 's7', value: '=', move: 'right'};
 	        steps['s7:']  = {state: 's8', value: '0', move: 'right'};
-
-			// Turning machine
-			var turing = new Turing(steps, 's1', 's8');
-			turing.tape = ['1', '1', '1', '*', '1', '1', '='];
-			turing.calc = '3 * 2 =';
+	        
+	        var turing = new Turing(steps, 's1', 's8');
+			turing.tape1 = ['1', '1', '1', '*', '1', '1', '='];
 			turing.reset();
 
-			$('#run').click(function () {
+			turing.stringToSteps($("#steps-area").text());
+
+			$('#run').click(function (e) {
+				e.preventDefault();
 				turing.run();
 			});
 
-			$('#step').click(function () {
+			$('#step').click(function (e) {
+				e.preventDefault();
 				turing.step();
 			});
 
-			$('#reset').click(function () {
+			$('#reset').click(function (e) {
+				e.preventDefault();
 				turing.reset();
 			});
 
-			$('#calc').click(function () {
-				var calc = prompt('Please type in new calculation (e.g. 3 * 2):');
-				if (calc) {
-					var match = calc.match(/([0-9]+)[ ]*\*[ ]*([0-9]+)/i);
-					if (match) {
-						var first = parseInt(match[1]), second = parseInt(match[2]);
-						var tape = [];
-						var i = 0;
-						if (0 == first) {
-							tape[i++] = '0';
-						} else {
-							for ( ; i < first; i++) {
-								tape[i] = '1';
-							}
-						}
-						tape[i++] = '*';
-						if (0 == second) {
-							tape[i++] = '0';
-						} else {
-							for (var end = second + i; i < end; i++) {
-								tape[i] = '1';
-							}
-						}
-						tape[i++] = '=';
-						turing.tape = tape;
-						turing.calc = first + ' * ' + second + ' =';
-						turing.reset();
-					} else {
-						alert('Sorry, invalid input!');
-					}
+			//Save Tape
+			$(".turing-tape1 input, .turing-tape2 input").keyup(function(e){
+				$("#save-tape").removeClass("hidden");
+			});
+
+			$("#save-tape").click(function(e){
+				e.preventDefault();
+				turing.changeTape();
+				$(this).addClass("hidden");
+			});
+
+
+			//Save Transitions
+			var stepsAreaHidden = true;
+			$("#steps-area").keyup(function(e){
+				if(stepsAreaHidden){
+					$("#save-automato").removeClass("hidden");
+					stepsAreaHidden = false;
+				}
+			});
+
+			$("#save-automato").click(function(e){
+				e.preventDefault();
+				turing.changeTape();
+				$(this).addClass("hidden");
+				stepsAreaHidden = true;
+			});
+
+
+			//Save Config
+			$("#tape-size, #speed").keyup(function(e){
+				$("#save-config").removeClass("hidden");
+			});
+			
+			$("#save-config").click(function(e){
+				e.preventDefault();
+				var tapeSize = $("#tape-size").val();
+				if(tapeSize){
+					turing.length = tapeSize;
+				}
+				var speed = $("#speed").val();
+				if(speed){
+					turing.speed = speed;
+				}
+				$(this).addClass("hidden");
+			});
+
+			$(".turing-tape1, .turing-tape2").on('dblclick', 'input', function(e){
+				var $this = $(this);
+				if($this.closest(".turing-tape1").length){
+					$(".turing-tape1 .active").removeClass("active");
+					$this.parent().addClass("active");
+				}
+				if($this.closest(".turing-tape2").length){
+					$(".turing-tape2 .active").removeClass("active");
+					$this.parent().addClass("active");
 				}
 			});
 		});
 	</script>
 </head>
 <body>
+	<div id="container">
+		<div id="tape" class="box">
+			<h1>Turing Machine</h1>
+			<div class="tapes">
+				<h2>
+					Current Tapes 
+					<a class="btn pull-right hidden" id="save-tape" href="#">Save</a>
+				</h2>
+				<div class="tapes-list">
+					<ol class="turing-tape1"></ol>
+					<ol class="turing-tape2"></ol>
+				</div>
+			</div>
+			<div class="states">
+				<div class="w-horizontal">
+					<div class="w w2">
+						<h2>State</h2>
+						<p id="state"></p>
+					</div>
+					<div class="w w2">
+						<h2>Step</h2>
+						<p id="count"></p>
+					</div>
+				</div>
+			</div>
+		</div>
 
-	<ol class="turing"></ol>
-	
-	<div class="container">
-		<div class="actions">
+
+		<div id="automato" class="box left">
+			<h1>Automato</h1>
+
+			<div class="transictions">
+				<h2>
+					Transitions
+					<a class="btn pull-right hidden" id="save-automato" href="#">Save</a>
+				</h2>
+				<textarea id="steps-area"></textarea>
+			</div>
+
+			<!--
+			<div id="canvas"></div>
+			-->
+
+		</div>
+
+
+		<div id="config" class="box right">
+			<h1>Control Panel</h1>
+
+			<h2>
+				Configuration
+				<a class="btn pull-right hidden" id="save-config" href="#">Save</a>
+			</h2>
+			<dl>
+				<dt>Tape Size</dt>
+				<dd><input type="text" id="tape-size" /></dd>
+			</dl>
+			<dl>
+				<dt>Speed</dt>
+				<dd><input type="text" id="speed" /></dd>
+			</dl>
+
 			<h2>Actions</h2>
-			<p>
-				<input id="run" type="button" value="Run" />
-				<input id="step" type="button" value="Next step" />
-				<input id="reset" type="button" value="Reset" />
-			</p>
-		</div>
-		<div class="count">
-			<h2>Count</h2>
-			<p id="count"></p>
-		</div>
-		<div class="state">
-			<h2>State</h2>
-			<p id="state"></p>
-		</div>
-		<div class="calc">
-			<h2>Calculation</h2>
-			<p id="calc"></p>
+			<div class="actions">
+				<a class="btn" id="run" href="#">
+					<i class="fa fa-play"></i> <span>Execute</span>
+				</a>
+				<a class="btn" id="step" href="#">
+					<i class="fa fa-step-forward"></i> Next step
+				</a>
+				<a class="btn" id="reset" href="#">
+					<i class="fa fa-refresh"></i> Reset
+				</a>
+			</div>
 		</div>
 
-		<div id="canvas"></div>
 	</div>
 </body>
 </html>
