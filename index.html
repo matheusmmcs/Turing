@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
 	<meta charset="utf-8" />
-	<title>Turing machine in JavaScript</title>
+	<title>Turing Machine - Two Tapes</title>
 	<link rel="stylesheet" href="css/style.css" />
 	<link href='css/font-awesome.css' rel='stylesheet' />
 
@@ -116,8 +116,9 @@
 	        steps['s7:='] = {state: 's7', value: '=', move: 'right'};
 	        steps['s7:']  = {state: 's8', value: '0', move: 'right'};
 	        
-	        var turing = new Turing(steps, 's1', ['s8','s9']);
+	        var turing = new Turing(steps, steps, 's1', ['s8','s9']);
 			turing.tape1 = ['1', '1', '1', '*', '1', '1', '='];
+			turing.tape2 = ['1', '1', '1', '*', '1', '1', '='];
 			turing.reset();
 
 			turing.stringToSteps($("#steps-area").text());

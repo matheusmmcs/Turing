@@ -1,6 +1,7 @@
 
-var Turing = function (steps, start, end) {
-	this.steps = steps;
+var Turing = function (steps1, steps2, start, end) {
+	this.steps1 = steps1;
+	this.steps2 = steps2;
 	this.start = start;
 	this.end = end;
 	this.tape1 = [];
@@ -120,63 +121,78 @@ Turing.prototype.field = function (value) {
  */
 Turing.prototype.machine = function () {
 
-	var value = $(this.tape1class + ' .active input').val();
-	console.log('Evaluate ' + this.current + ' with value ' + value);
+	var value1 = $(this.tape1class + ' .active input').val();
+	var value2 = $(this.tape2class + ' .active input').val();
 
-	var step = this.steps[this.current + ':' + value];
-	if (typeof step != 'undefined') {
-		this.current = step.state;
-		this.count++;
-		this.timeout = setTimeout(function (that) {
-			that.write(step);
-		}, 1, this);
+	console.log('T1 Evaluate ' + this.current + ' with value ' + value1);
+	console.log('T2 Evaluate ' + this.current + ' with value ' + value2);
 
+	var step1 = this.steps1[this.current + ':' + value1];
+	var step2 = this.steps2[this.current + ':' + value2];
+
+	if (typeof step1 != 'undefined' && typeof step2 != 'undefined') {
+		if(step1.state == step2.state){
+			this.current = step1.state;
+			this.count++;
+			this.timeout = setTimeout(function (that) {
+				that.write(step1, step2);
+			}, 1, this);
+		}else{
+			this.exception('Tape 1 next state is diff to Tape 2 = ' + this.current + ' reading ' + value1 + ' and ' + value2 + ' (' + step1.state + ' != ' + step2.state + ')');
+		}
 	} else {
-		alert('Undefined state ' + this.current + ' with value ' + value);
-		console.log('Undefined state ' + this.current + ' with value ' + value);
-		this.run();
-		$('#reset').removeAttr('disabled');
+		this.exception('Tape 1 undefined state ' + this.current + ' with value ' + value1 + ' or ' + 'Tape 2 undefined state ' + this.current + ' with value ' + value2);
 	}
 };
 
 /**
  * Method to write value.
  */
-Turing.prototype.write = function (step) {
+Turing.prototype.write = function (step1, step2) {
 
-	console.log("Write value " + step.value);
+	console.log("Write value " + step1.value);
 	// write
-	$(this.tape1class + ' .active input').val(step.value);
+	$(this.tape1class + ' .active input').val(step1.value);
+	$(this.tape2class + ' .active input').val(step2.value);
+
 	this.timeout = setTimeout(function (that) {
-		that.move(step);
+		that.move(step1, step2);
 	}, 500 / this.speed, this);
 };
 
 /**
  * Method to move Turing to next step.
  */
-Turing.prototype.move = function (step) {
+Turing.prototype.move = function (step1, step2) {
 
-	console.log("Move " + step.move);
-	var active = $(this.tape1class + ' .active');
+	console.log("Move " + step1.move);
+	
+	mv($(this.tape1class + ' .active'), step1);
+	mv($(this.tape2class + ' .active'), step2);
 
 	// move
-	active.removeClass('active');
-	switch (step.move) {
-		case 'left':
-			// move left
-			if (!active.prev().prev().length) {
-				active.before(this.field());
-			}
-			active.prev().addClass('active');
-			break;
+	function mv(active, step){
+		active.removeClass('active');
+		var move = "";
+		switch (step.move) {
+			case 'left':
+				// move left
+				move = "left";
+				if (!active.prev().prev().length) {
+					active.before(this.field());
+				}
+				active.prev().addClass('active');
+				break;
 
-		default:
-			// move right
-			if (!active.next().next().length) {
-				active.after(this.field());
-			}
-			active.next().addClass('active');
+			default:
+				// move right
+				move = "right";
+				if (!active.next().next().length) {
+					active.after(this.field());
+				}
+				active.next().addClass('active');
+		}
+		return move;
 	}
 
 	this.info();
@@ -235,18 +251,24 @@ Turing.prototype.step = function () {
 
 Turing.prototype.stepsToString = function(){
 	var result = "";
-	for(var i in this.steps){
+	for(var i in this.steps1){
 		var q = i.split(":");
-		var s = this.steps[i];
-		result += "Q("+q[0]+","+q[1]+") = ("+s.state+","+s.value+","+s.move+");\n"
+		var s = this.steps1[i];
+		result += "T1("+q[0]+","+q[1]+") = ("+s.state+","+s.value+","+s.move+");\n";
+	}
+	result += "\n";
+	for(var i in this.steps2){
+		var q = i.split(":");
+		var s = this.steps2[i];
+		result += "T2("+q[0]+","+q[1]+") = ("+s.state+","+s.value+","+s.move+");\n";
 	}
 	return result;
 }
 
 Turing.prototype.stringToSteps = function(textarea){
-	var steps = {};
+	var steps1 = {}, steps2 = {};
 	var s = textarea.split(";");
-	var regexp = /Q\(([^\,]*)\,([^\)])?\)\s*\=\s*\(([^\,]*)\,([^\,]*)?\,([^\,]*)\)/;
+	var regexp = /(T[1,2]?)\(([^\,]*)\,([^\)])?\)\s*\=\s*\(([^\,]*)\,([^\,]*)?\,([^\,]*)\)/;
 
 	function r(s){
 		if(s === undefined || s === null){
@@ -256,24 +278,43 @@ Turing.prototype.stringToSteps = function(textarea){
 		}
 	}
 
+	function addEl(obj, matches){
+		obj[r(matches[2])+":"+r(matches[3])] = {state: r(matches[4]), value: r(matches[5]), move: r(matches[6])};
+	}
+
 	for(var i in s){
 		var line = s[i].replace("\n", "");
 		var matches = regexp.exec(line);
 		if(matches){
-			steps[r(matches[1])+":"+r(matches[2])] = {state: r(matches[3]), value: r(matches[4]), move: r(matches[5])};
+			if(r(matches[1]) == "T1"){
+				addEl(steps1, matches);
+			}else if(r(matches[1]) == "T2"){
+				addEl(steps2, matches);
+			}
 		}
 	}
 
-	this.steps = steps;
+	this.steps1 = steps1;
+	this.steps2 = steps2;
 }
 
-Turing.prototype.setHead = function($this){
+Turing.prototype.setHead = function($this){	
 	if($this.closest(".turing-tape1").length){
 		$(".turing-tape1 .active").removeClass("active");
-		$this.parent().addClass("active");
+		//var idx = $(".turing-tape1 input").index($this);
+		//$(".turing-tape2 input").eq(idx).parent().addClass("active");
 	}
 	if($this.closest(".turing-tape2").length){
 		$(".turing-tape2 .active").removeClass("active");
-		$this.parent().addClass("active");
+		//var idx = $(".turing-tape2 input").index($this);
+		//$(".turing-tape1 input").eq(idx).parent().addClass("active");
 	}
+	$this.parent().addClass("active");
+}
+
+Turing.prototype.exception = function(s){
+	alert(s);
+	console.log(s);
+	this.run();
+	$('#reset').removeAttr('disabled');
 }

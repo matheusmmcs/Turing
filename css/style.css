@@ -267,5 +267,5 @@ dd input[type="text"]{
 }
 .transictions textarea{
 	width: 100%;
-	height: 155px;
+	min-height: 155px;
 }
