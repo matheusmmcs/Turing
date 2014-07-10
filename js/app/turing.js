@@ -104,7 +104,7 @@ Turing.prototype.info = function () {
 	$('#canvas .text').attr({fill: '#000'});
 	$('#canvas .text.' + this.current).attr({fill: '#fff'});
 	
-	$("#steps-area").text(this.stepsToString());
+	$("#steps-area").val(this.stepsToString());
 	$("#finalstates").val(this.end.join(";"));
 	$("#initialstate").val(this.start);
 };
@@ -284,6 +284,7 @@ Turing.prototype.stringToSteps = function(textarea){
 
 	for(var i in s){
 		var line = s[i].replace("\n", "");
+		console.log(line)
 		var matches = regexp.exec(line);
 		if(matches){
 			if(r(matches[1]) == "T1"){
@@ -293,6 +294,9 @@ Turing.prototype.stringToSteps = function(textarea){
 			}
 		}
 	}
+
+	console.log(steps1);
+	console.log(steps2);
 
 	this.steps1 = steps1;
 	this.steps2 = steps2;

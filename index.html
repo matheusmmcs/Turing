@@ -121,7 +121,7 @@
 			turing.tape2 = ['1', '1', '1', '*', '1', '1', '='];
 			turing.reset();
 
-			turing.stringToSteps($("#steps-area").text());
+			turing.stringToSteps($("#steps-area").val());
 
 			$('#run').click(function (e) {
 				e.preventDefault();
@@ -145,7 +145,7 @@
 				}
 			});
 
-			//Save Tape
+			//Save Automato Config
 			$("#initialstate, #finalstates").keyup(function(e){
 				$("#save-automato-config").removeClass("hidden");
 			});
@@ -164,8 +164,8 @@
 				$(this).addClass("hidden");
 			});
 
-			//Save Automato Config
-			$(".turing-tape1 input, .turing-tape2 input").keyup(function(e){
+			//Save Tape
+			$(".turing-tape1, .turing-tape2").on('keyup', 'input', function(e){
 				$("#save-tape").removeClass("hidden");
 			});
 
@@ -186,7 +186,7 @@
 
 			$("#save-automato").click(function(e){
 				e.preventDefault();
-				turing.changeTape();
+				turing.stringToSteps($("#steps-area").val());
 				$(this).addClass("hidden");
 				stepsAreaHidden = true;
 			});
