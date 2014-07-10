@@ -124,17 +124,24 @@
 
 			$('#run').click(function (e) {
 				e.preventDefault();
-				turing.run();
+				var dis = $(this).attr('disabled');
+				if($(this).attr('disabled') != 'disabled'){
+					turing.run();
+				}
 			});
 
 			$('#step').click(function (e) {
 				e.preventDefault();
-				turing.step();
+				if($(this).attr('disabled') != 'disabled'){
+					turing.step();
+				}
 			});
 
 			$('#reset').click(function (e) {
 				e.preventDefault();
-				turing.reset();
+				if($(this).attr('disabled') != 'disabled'){
+					turing.reset();
+				}
 			});
 
 			//Save Tape

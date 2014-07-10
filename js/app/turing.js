@@ -22,6 +22,7 @@ Turing.prototype.run = function () {
 	if (this.stop) {
 		$('#run span').text("Pause");
 		$('#run i').attr("class", "fa fa-pause");
+		$('#run').removeAttr('disabled');
 		$('#step').attr('disabled', 'disabled');
 		$('#reset').attr('disabled', 'disabled');
 		this.stop = false;
@@ -76,8 +77,16 @@ Turing.prototype.reset = function () {
 
 	$('#run span').text("Run");
 	$('#run i').attr("class", "fa fa-play");
-	$("#run").attr('disabled', '');
-	$('#step').attr('disabled', '');
+	$("#run").removeAttr('disabled');
+	$('#step').removeAttr('disabled');
+	$('#reset').removeAttr('disabled');
+
+	//reset all save buttons
+	$('#save-config').addClass("hidden");
+	$('#save-automato').addClass("hidden");
+	$('#save-automato-config').addClass("hidden");
+	$('#set-head').addClass("hidden");
+	$('#save-tape').addClass("hidden");
 
 	this.info();
 };
@@ -123,7 +132,10 @@ Turing.prototype.machine = function () {
 		}, 1, this);
 
 	} else {
+		alert('Undefined state ' + this.current + ' with value ' + value);
 		console.log('Undefined state ' + this.current + ' with value ' + value);
+		this.run();
+		$('#reset').removeAttr('disabled');
 	}
 };
 
@@ -177,9 +189,9 @@ Turing.prototype.move = function (step) {
 		// stopped
 		$('#run span').text("Run");
 		$('#run i').attr("class", "fa fa-play");
-		$("#run").attr('disabled', '');
-		$('#step').attr('disabled', '');
-		$('#reset').attr('disabled', '');	
+		$("#run").removeAttr('disabled');
+		$('#step').removeAttr('disabled');
+		$('#reset').removeAttr('disabled');	
 	}
 };
 
@@ -207,7 +219,7 @@ Turing.prototype.check = function () {
 		$('#run i').attr("class", "fa fa-play");
 		$("#run").attr('disabled', 'disabled');
 		$('#step').attr('disabled', 'disabled');
-		$('#reset').attr('disabled', '');
+		$('#reset').removeAttr('disabled');
 	}
 };
 
