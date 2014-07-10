@@ -20,19 +20,14 @@ var Turing = function (steps, start, end) {
 Turing.prototype.run = function () {
 
 	if (this.stop) {
-
 		$('#run span').text("Pause");
 		$('#run i').attr("class", "fa fa-pause");
 		$('#step').attr('disabled', 'disabled');
 		$('#reset').attr('disabled', 'disabled');
-
 		this.stop = false;
-
 		// start machine
 		this.machine();
-
 	} else {
-
 		// Pause
 		this.stop = true;
 		$('#run span').text("Pausing…")
@@ -60,7 +55,7 @@ Turing.prototype.changeTape = function () {
 }
 
 Turing.prototype.reset = function () {
-	var start = 2;
+	var start = 1;
 
 	function resetTape(tapeClass, tape){
 		$(tapeClass).text('');
@@ -100,6 +95,8 @@ Turing.prototype.info = function () {
 	$('#canvas .text.' + this.current).attr({fill: '#fff'});
 	
 	$("#steps-area").text(this.stepsToString());
+	$("#finalstates").val(this.end.join(";"));
+	$("#initialstate").val(this.start);
 };
 
 Turing.prototype.field = function (value) {
@@ -115,16 +112,12 @@ Turing.prototype.field = function (value) {
 Turing.prototype.machine = function () {
 
 	var value = $(this.tape1class + ' .active input').val();
-
 	console.log('Evaluate ' + this.current + ' with value ' + value);
 
 	var step = this.steps[this.current + ':' + value];
-
 	if (typeof step != 'undefined') {
-
 		this.current = step.state;
 		this.count++;
-
 		this.timeout = setTimeout(function (that) {
 			that.write(step);
 		}, 1, this);
@@ -140,13 +133,11 @@ Turing.prototype.machine = function () {
 Turing.prototype.write = function (step) {
 
 	console.log("Write value " + step.value);
-
 	// write
 	$(this.tape1class + ' .active input').val(step.value);
-
 	this.timeout = setTimeout(function (that) {
 		that.move(step);
-	}, this.speed, this);
+	}, 500 / this.speed, this);
 };
 
 /**
@@ -155,13 +146,11 @@ Turing.prototype.write = function (step) {
 Turing.prototype.move = function (step) {
 
 	console.log("Move " + step.move);
-
 	var active = $(this.tape1class + ' .active');
 
 	// move
 	active.removeClass('active');
 	switch (step.move) {
-
 		case 'left':
 			// move left
 			if (!active.prev().prev().length) {
@@ -181,13 +170,10 @@ Turing.prototype.move = function (step) {
 	this.info();
 
 	if (this.stop == false) {
-
 		this.timeout = setTimeout(function (that) {
 			that.check();
-		}, this.speed, this);
-
+		}, 500 / this.speed, this);
 	} else {
-
 		// stopped
 		$('#run span').text("Run");
 		$('#run i').attr("class", "fa fa-play");
@@ -202,13 +188,10 @@ Turing.prototype.move = function (step) {
  */
 Turing.prototype.check = function () {
 
-	if (this.current != this.end) {
-
+	if (this.end.indexOf(this.current) == -1) {
 		// all good
 		this.machine();
-
 	} else {
-
 		console.log("Final " + this.current);
 
 		var result = [];
@@ -229,13 +212,11 @@ Turing.prototype.check = function () {
 };
 
 Turing.prototype.step = function () {
-
 	$('#run').attr('disabled', 'disabled')
 	$('#step').attr('disabled', 'disabled');
 	$('#reset').attr('disabled', 'disabled');
 
 	this.stop = true;
-
 	// start for one step machine
 	this.check();
 };
@@ -268,9 +249,19 @@ Turing.prototype.stringToSteps = function(textarea){
 		var matches = regexp.exec(line);
 		if(matches){
 			steps[r(matches[1])+":"+r(matches[2])] = {state: r(matches[3]), value: r(matches[4]), move: r(matches[5])};
-			//console.log(r(matches[1])+":"+r(matches[2]), {state: r(matches[3]), value: r(matches[4]), move: r(matches[5])})
 		}
 	}
 
 	this.steps = steps;
+}
+
+Turing.prototype.setHead = function($this){
+	if($this.closest(".turing-tape1").length){
+		$(".turing-tape1 .active").removeClass("active");
+		$this.parent().addClass("active");
+	}
+	if($this.closest(".turing-tape2").length){
+		$(".turing-tape2 .active").removeClass("active");
+		$this.parent().addClass("active");
+	}
 }

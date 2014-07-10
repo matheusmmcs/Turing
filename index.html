@@ -116,7 +116,7 @@
 	        steps['s7:='] = {state: 's7', value: '=', move: 'right'};
 	        steps['s7:']  = {state: 's8', value: '0', move: 'right'};
 	        
-	        var turing = new Turing(steps, 's1', 's8');
+	        var turing = new Turing(steps, 's1', ['s8','s9']);
 			turing.tape1 = ['1', '1', '1', '*', '1', '1', '='];
 			turing.reset();
 
@@ -138,6 +138,25 @@
 			});
 
 			//Save Tape
+			$("#initialstate, #finalstates").keyup(function(e){
+				$("#save-automato-config").removeClass("hidden");
+			});
+
+			$("#save-automato-config").click(function(e){
+				e.preventDefault();
+				var s = $("#initialstate").val().replace(/\s/,"");
+				if(s){
+					turing.start = s;
+				}
+				var e = $("#finalstates").val().replace(/\s/,"").split(";");
+				if(e){
+					turing.end = e;
+				}
+				turing.reset();
+				$(this).addClass("hidden");
+			});
+
+			//Save Automato Config
 			$(".turing-tape1 input, .turing-tape2 input").keyup(function(e){
 				$("#save-tape").removeClass("hidden");
 			});
@@ -147,7 +166,6 @@
 				turing.changeTape();
 				$(this).addClass("hidden");
 			});
-
 
 			//Save Transitions
 			var stepsAreaHidden = true;
@@ -167,7 +185,11 @@
 
 
 			//Save Config
-			$("#tape-size, #speed").keyup(function(e){
+			$(" #speed").change(function(){
+				$("#save-config").removeClass("hidden");
+			});
+
+			$("#tape-size").keyup(function(e){
 				$("#save-config").removeClass("hidden");
 			});
 			
@@ -178,23 +200,30 @@
 					turing.length = tapeSize;
 				}
 				var speed = $("#speed").val();
-				if(speed){
+				if(speed && !isNaN(speed)){
 					turing.speed = speed;
 				}
 				$(this).addClass("hidden");
 			});
 
+			//Set Head
+			var $lastTape = null;
 			$(".turing-tape1, .turing-tape2").on('dblclick', 'input', function(e){
 				var $this = $(this);
-				if($this.closest(".turing-tape1").length){
-					$(".turing-tape1 .active").removeClass("active");
-					$this.parent().addClass("active");
-				}
-				if($this.closest(".turing-tape2").length){
-					$(".turing-tape2 .active").removeClass("active");
-					$this.parent().addClass("active");
-				}
+				turing.setHead($this);
+			}).on('click', 'input', function(){
+				$lastTape = $(this);
+				$("#set-head").removeClass("hidden");
 			});
+
+			$("#set-head").on("click", function(e){
+				e.preventDefault();
+				if($lastTape){
+					turing.setHead($lastTape);
+				}
+				$(this).addClass("hidden");
+			});
+
 		});
 	</script>
 </head>
@@ -205,6 +234,7 @@
 			<div class="tapes">
 				<h2>
 					Current Tapes 
+					<a class="btn pull-right hidden" id="set-head" href="#">Set Head</a>
 					<a class="btn pull-right hidden" id="save-tape" href="#">Save</a>
 				</h2>
 				<div class="tapes-list">
@@ -229,6 +259,26 @@
 
 		<div id="automato" class="box left">
 			<h1>Automato</h1>
+
+			<h2>
+				Initial/Final States
+				<a class="btn pull-right hidden" id="save-automato-config" href="#">Save and Reset</a>
+			</h2>
+			<div class="w-horizontal">
+				<div class="w w2">
+					<dl>
+						<dt>Initial State</dt>
+						<dd><input type="text" id="initialstate" /></dd>
+					</dl>
+				</div>
+				<div class="w w2">
+					<dl>
+						<dt>Final States</dt>
+						<dd><input type="text" id="finalstates" /></dd>
+					</dl>
+				</div>
+			</div>
+			
 
 			<div class="transictions">
 				<h2>
@@ -258,7 +308,9 @@
 			</dl>
 			<dl>
 				<dt>Speed</dt>
-				<dd><input type="text" id="speed" /></dd>
+				<dd>
+					<span>1</span><input type="range" id="speed" min="1" max="100"><span>100</span>
+				</dd>
 			</dl>
 
 			<h2>Actions</h2>
