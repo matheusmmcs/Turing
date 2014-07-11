@@ -7,7 +7,7 @@ var Turing = function (steps1, steps2, start, end) {
 	this.tape1 = [];
 	this.tape2 = [];
 	this.length = 40;
-	this.speed = 10;
+	this.speed = 50;
 	this.stop = true;
 	this.count = 0;
 
@@ -157,7 +157,7 @@ Turing.prototype.write = function (step1, step2) {
 
 	this.timeout = setTimeout(function (that) {
 		that.move(step1, step2);
-	}, 500 / this.speed, this);
+	}, 1000 / this.speed, this);
 };
 
 /**
@@ -200,7 +200,7 @@ Turing.prototype.move = function (step1, step2) {
 	if (this.stop == false) {
 		this.timeout = setTimeout(function (that) {
 			that.check();
-		}, 500 / this.speed, this);
+		}, 1000 / this.speed, this);
 	} else {
 		// stopped
 		$('#run span').text("Run");

@@ -151,6 +151,7 @@ li input[type=text]{
 	text-align: center;
 	background-color: #fff;
 	color: #000;
+	border-radius: 35px;
 }
 li.active input[type=text]{
 	background-color: #cfd8dc;

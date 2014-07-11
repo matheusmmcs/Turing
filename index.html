@@ -1,7 +1,9 @@
 <!doctype html>
 <head>
 	<meta charset="utf-8" />
-	<title>Turing Machine - Two Tapes</title>
+	<title>Turing Machine - Two Tapes - Jeff, Matheus e Pedro</title>
+	<meta type="author" value="Jeff, Matheus e Pedro" />
+
 	<link rel="stylesheet" href="css/style.css" />
 	<link href='css/font-awesome.css' rel='stylesheet' />
 
@@ -13,112 +15,35 @@
 	<script>
 		$(function () {
 
-			// Graph
-			/*
-	        var r = Raphael('canvas', 640, 400);
-			var top = 200;
-			
-	        var s1 = r.circle(40, top + 0, 20);
-	        s1.node.setAttribute('class', 'state s1');
-	        var t1 = r.text(40, top + 0, "s1").attr({ "font-size": 15});
-	        t1.node.setAttribute('class', 'text s1');
-	        
-	        var s2 = r.circle(200, top + 0, 20);
-	        s2.node.setAttribute('class', 'state s2');
-	        var t2 = r.text(200, top + 0, "s2").attr({ "font-size": 15});
-	        t2.node.setAttribute('class', 'text s2');
-
-	        var s3 = r.circle(350, top + 0, 20);
-	        s3.node.setAttribute('class', 'state s3');
-	        var t3 = r.text(350, top + 0, "s3").attr({ "font-size": 15});
-	        t3.node.setAttribute('class', 'text s3');
-
-	        var s4 = r.circle(500, top + 0, 20);
-	        s4.node.setAttribute('class', 'state s4');
-	        var t4 = r.text(500, top + 0, "s4").attr({ "font-size": 15});
-	        t4.node.setAttribute('class', 'text s4');
-
-	        var s5 = r.circle(500, top + 160, 20);
-	        s5.node.setAttribute('class', 'state s5');
-	       	var t5 = r.text(500, top + 160, "s5").attr({ "font-size": 15});
-	        t5.node.setAttribute('class', 'text s5');
-	        
-
-	        var s6 = r.circle(350, top + 160, 20);
-	        s6.node.setAttribute('class', 'state s6');
-	        var t6 = r.text(350, top + 160, "s6").attr({ "font-size": 15});
-	        t6.node.setAttribute('class', 'text s6');
-
-	        var s7 = r.circle(200, top - 100, 20);
-	        s7.node.setAttribute('class', 'state s7');
-	        var t7 = r.text(200, top - 100, "s7").attr({ "font-size": 15});
-	        t7.node.setAttribute('class', 'text s7');
-
-	        var s8 = r.circle(40, top - 100, 20);
-	        s8.node.setAttribute('class', 'state s8');
-	        var t8 = r.text(40, top - 100, "s8").attr({ "font-size": 15});
-	        t8.node.setAttribute('class', 'text s8');
-
-	        s1.joint(s2, {label: '1 / X, R', attrs: {'stroke-dasharray': 'none'}});
-	        s2.joint(s2, {label: '1 / 1, R', vertices: ['230 ' + (top + 80), '160 ' + (top + 80)], attrs: {'stroke-dasharray': 'none'}});
-	        s2.joint(s3, {label: '* / *, R', attrs: {'stroke-dasharray': 'none'}});
-	        s3.joint(s4, {label: '1 / Y, R', attrs: {'stroke-dasharray': 'none'}});
-	        s3.joint(s6, {label: '= / =, L', attrs: {'stroke-dasharray': 'none'}});
-	        s4.joint(s4, {label: '1 / 1, R\n= / =, R', vertices: ['560 ' + (top - 40), '560 ' + (top + 40)], attrs: {'stroke-dasharray': 'none'}});
-	        s4.joint(s5, {label: '  / 1, L', attrs: {'stroke-dasharray': 'none'}});
-	        s5.joint(s5, {label: '1 / 1, L\n= / =, L', vertices: ['560 ' + (top + 120), '560 ' + (top + 200)], attrs: {'stroke-dasharray': 'none'}});
-	        s5.joint(s3, {label: 'Y / Y, R', attrs: {'stroke-dasharray': 'none'}});
-	        s6.joint(s6, {label: 'Y / 1, L\n* / *, L\n1 / 1, L', vertices: ['410 ' + (top + 120), '410 ' + (top + 200)], attrs: {'stroke-dasharray': 'none'}});
-	        s6.joint(s1, {label: 'X / X, R', vertices: ['180 ' + (top + 160)], attrs: {'stroke-dasharray': 'none'}});
-	        s1.joint(s8, {label: '* / *, R', attrs: {'stroke-dasharray': 'none'}});
-
-	        s1.joint(s7, {label: '0 / 0, R', attrs: {'stroke-dasharray': 'none'}});
-	        s3.joint(s7, {label: '0 / 0, R', attrs: {'stroke-dasharray': 'none'}});
-	        s7.joint(s7, {label: '* / *, R\n1 / 1, R\n0 / 0, R\n= / =, R', vertices: ['230 ' + (top - 170), '160 ' + (top - 170)], attrs: {'stroke-dasharray': 'none'}});
-	        s7.joint(s8, {label: '  / 0, R', attrs: {'stroke-dasharray': 'none'}});
-			*/
-
 	        // Steps
 			var steps = {};
-			steps['s1:1'] = {state: 's2', value: 'X', move: 'right'};
-	        steps['s1:*'] = {state: 's8', value: '*', move: 'right'};
+			steps['q0:a'] = {state: 'qa', value: 'X', move: 'right'};
+			steps['q0:Y'] = {state: 'qY', value: 'Y', move: 'right'};
 
-	        // s2: move to right until * and goto s3 
-	        steps['s2:1'] = {state: 's2', value: '1', move: 'right'};
-	        steps['s2:*'] = {state: 's3', value: '*', move: 'right'};
+			steps['qa:a'] = {state: 'qa', value: 'a', move: 'right'};
+			steps['qa:b'] = {state: 'qb', value: 'Y', move: 'right'};
+			steps['qa:Y'] = {state: 'qa', value: 'Y', move: 'right'};
 
-	        // s3: replace 1 with Y and goto s4
-	        steps['s3:1'] = {state: 's4', value: 'Y', move: 'right'};
-	        steps['s3:='] = {state: 's6', value: '=', move: 'left'};
+			steps['qb:b'] = {state: 'qb', value: 'b', move: 'right'};
+			steps['qb:c'] = {state: 'qc', value: 'Z', move: 'left'};
+			steps['qb:Z'] = {state: 'qb', value: 'Z', move: 'right'};
 
-	        // s4: write 1 into empty place and goto s5
-	        steps['s4:1'] = {state: 's4', value: '1', move: 'right'};
-	        steps['s4:='] = {state: 's4', value: '=', move: 'right'};
-	        steps['s4:']  = {state: 's5', value: '1', move: 'left'};
+			steps['qc:a'] = {state: 'qc', value: 'a', move: 'left'};
+			steps['qc:b'] = {state: 'qc', value: 'b', move: 'left'};
+			steps['qc:X'] = {state: 'q0', value: 'X', move: 'right'};
+			steps['qc:Y'] = {state: 'qc', value: 'Y', move: 'left'};
+			steps['qc:Z'] = {state: 'qc', value: 'Z', move: 'left'};
+
+			steps['qY:Y'] = {state: 'qY', value: 'Y', move: 'right'};
+			steps['qY:Z'] = {state: 'qZ', value: 'Z', move: 'right'};
+
+			steps['qZ:Z'] = {state: 'qZ', value: 'Z', move: 'right'};
+			steps['qZ:'] = {state: 'qf', value: '', move: 'left'};
+			
 	        
-	        // s4: seek left until Y
-	        steps['s5:1'] = {state: 's5', value: '1', move: 'left'};
-	        steps['s5:='] = {state: 's5', value: '=', move: 'left'};
-	        steps['s5:Y'] = {state: 's3', value: 'Y', move: 'right'};
-
-	        // s6: cleanup Y and seek X
-	        steps['s6:Y'] = {state: 's6', value: '1', move: 'left'};
-	        steps['s6:*'] = {state: 's6', value: '*', move: 'left'};
-	        steps['s6:1'] = {state: 's6', value: '1', move: 'left'};
-	        steps['s6:X'] = {state: 's1', value: 'X', move: 'right'};
-	        
-	        // handle 0
-	        steps['s1:0'] = {state: 's7', value: '0', move: 'right'};
-	        steps['s3:0'] = {state: 's7', value: '0', move: 'right'};
-	        steps['s7:*'] = {state: 's7', value: '*', move: 'right'};
-	        steps['s7:1'] = {state: 's7', value: '1', move: 'right'};
-	        steps['s7:0'] = {state: 's7', value: '0', move: 'right'};
-	        steps['s7:='] = {state: 's7', value: '=', move: 'right'};
-	        steps['s7:']  = {state: 's8', value: '0', move: 'right'};
-	        
-	        var turing = new Turing(steps, steps, 's1', ['s8','s9']);
-			turing.tape1 = ['1', '1', '1', '*', '1', '1', '='];
-			turing.tape2 = ['1', '1', '1', '*', '1', '1', '='];
+	        var turing = new Turing(steps, steps, 'q0', ['qf']);
+			turing.tape1 = ['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'c'];
+			turing.tape2 = ['a', 'a', 'a', 'b', 'b', 'b', 'c', 'c', 'c'];
 			turing.reset();
 
 			turing.stringToSteps($("#steps-area").val());
@@ -253,11 +178,11 @@
 			<div class="states">
 				<div class="w-horizontal">
 					<div class="w w2">
-						<h2>State</h2>
+						<h2>Current State</h2>
 						<p id="state"></p>
 					</div>
 					<div class="w w2">
-						<h2>Step</h2>
+						<h2>Current Step</h2>
 						<p id="count"></p>
 					</div>
 				</div>
@@ -266,7 +191,7 @@
 
 
 		<div id="automato" class="box left">
-			<h1>Automato</h1>
+			<h1>Automata</h1>
 
 			<h2>
 				Initial/Final States
@@ -295,11 +220,6 @@
 				</h2>
 				<textarea id="steps-area"></textarea>
 			</div>
-
-			<!--
-			<div id="canvas"></div>
-			-->
-
 		</div>
 
 
