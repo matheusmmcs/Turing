@@ -236,6 +236,8 @@ Turing.prototype.check = function () {
 		$("#run").attr('disabled', 'disabled');
 		$('#step').attr('disabled', 'disabled');
 		$('#reset').removeAttr('disabled');
+
+		this.exception('Ok, you have reached a final state!');
 	}
 };
 
